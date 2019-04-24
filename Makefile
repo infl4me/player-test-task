@@ -1,4 +1,4 @@
-develop:
+start:
 	npx webpack-dev-server --open
 
 install:
@@ -10,3 +10,6 @@ build:
 
 lint:
 	npx eslint .
+
+deploy: build
+	surge ./dist test-player.surge.sh
