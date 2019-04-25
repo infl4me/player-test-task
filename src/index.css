@@ -29,7 +29,7 @@ video {
   position: relative;
 }
 
-.player-overlay {
+.player-control-pause {
   position: absolute;
   top: 0;
   left: 0;

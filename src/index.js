@@ -12,12 +12,12 @@ const showIcon = (element, name) => {
 
 const app = () => {
   const player = document.querySelector('video');
-  const playerOverlay = document.querySelector('.player-overlay');
   const playerControl = document.querySelector('.player-control');
+  const playerControlPause = document.querySelector('.player-control-pause');
   const playerControlIcon = document.querySelector('.player-control-icon');
   const playerControlMute = document.querySelector('.player-control-mute');
   const playerControlIconMute = document.querySelector('.player-control-icon-mute');
-  const playerProgress = document.querySelector('.player-progress-play');
+  const playerProgressPlay = document.querySelector('.player-progress-play');
   const playerLoadingBox = document.querySelector('.player-loading-box');
 
   player.volume = 0.2;
@@ -28,7 +28,21 @@ const app = () => {
     currentTime: 0,
   };
 
-  playerOverlay.addEventListener('click', () => {
+  const onVideoReady = () => {
+    state.playerState = 'playing';
+    player.removeEventListener('canplaythrough', onVideoReady);
+  };
+  player.addEventListener('canplaythrough', onVideoReady);
+
+  player.addEventListener('ended', () => {
+    state.playerState = 'finished';
+  });
+
+  player.addEventListener('timeupdate', () => {
+    state.currentTime = player.currentTime;
+  });
+
+  playerControlPause.addEventListener('click', () => {
     if (state.playerState === 'playing') {
       state.playerState = 'paused';
     }
@@ -50,23 +64,7 @@ const app = () => {
     state.muted = !state.muted;
   });
 
-  const onVideoReady = () => {
-    state.playerState = 'playing';
-    player.removeEventListener('canplaythrough', onVideoReady);
-  };
-
-  player.addEventListener('canplaythrough', onVideoReady);
-
-  player.addEventListener('ended', () => {
-    state.playerState = 'finished';
-  });
-
-  player.addEventListener('timeupdate', () => {
-    state.currentTime = player.currentTime;
-  });
-
   watch(state, 'playerState', () => {
-    console.log(state.playerState);
     switch (state.playerState) {
       case ('paused'):
         show(playerControl);
@@ -97,7 +95,7 @@ const app = () => {
   });
 
   watch(state, 'currentTime', () => {
-    playerProgress.style.width = `${state.currentTime / player.duration * 100}%`;
+    playerProgressPlay.style.width = `${state.currentTime / player.duration * 100}%`;
   });
 
   if (player.readyState > 3) {
