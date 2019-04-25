@@ -17,7 +17,8 @@ const app = () => {
   const playerControlIcon = document.querySelector('.player-control-icon');
   const playerControlMute = document.querySelector('.player-control-mute');
   const playerControlIconMute = document.querySelector('.player-control-icon-mute');
-  const playerProgress = document.querySelector('.player-progress');
+  const playerProgress = document.querySelector('.player-progress-play');
+  const playerLoadingBox = document.querySelector('.player-loading-box');
 
   player.volume = 0.2;
 
@@ -74,6 +75,7 @@ const app = () => {
         break;
       case ('playing'):
         hide(playerControl);
+        hide(playerLoadingBox);
         player.play();
         break;
       case ('finished'):
