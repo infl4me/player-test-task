@@ -5,20 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Player</title>
-  <!-- <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script> -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 <body>
   <div class="root">
     <div class="player">
-      <div class="player-overlay">
-        <video autoplay src="http://v1-rtc.1internet.tv/video/multibitrate/video/2018/12/13/3c7a1fae-88d5-48cb-a451-17fa7f8082ef_20180511_Dekabristi_new_950.mp4"></video>
+      <div class="player-wrap">
+        <video muted src="http://v1-rtc.1internet.tv/video/multibitrate/video/2018/12/13/3c7a1fae-88d5-48cb-a451-17fa7f8082ef_20180511_Dekabristi_new_950.mp4"></video>
+        <div class="player-overlay"></div>
         <button class="btn player-control hidden">
           <i class="player-control-icon"></i>
         </button>
-        <button class="btn player-control-mute">
+        <button class="btn player-control-mute hidden">
           <i class="player-control-icon-mute fas fa-volume-mute"></i>
         </button>
+        <div class="player-progress-bar">
+          <div class="player-progress"></div>
+        </div>
       </div>
     </div>
   </div>
