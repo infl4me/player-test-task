@@ -1,4 +1,4 @@
 # Usage
-  npm i
+  make install
 
   make start

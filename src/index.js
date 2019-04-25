@@ -19,7 +19,7 @@ const app = () => {
   const playerControlIconMute = document.querySelector('.player-control-icon-mute');
   const playerProgress = document.querySelector('.player-progress');
 
-  player.volume = 0.3;
+  player.volume = 0.2;
 
   const state = {
     playerState: 'loading',
