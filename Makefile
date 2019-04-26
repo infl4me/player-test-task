@@ -17,4 +17,7 @@ test:
 deploy: build
 	surge ./dist test-player.surge.sh
 
+cypress-open:
+	npx cypress open
+
 .PHONY: test

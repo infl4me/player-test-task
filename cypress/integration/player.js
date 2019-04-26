@@ -71,7 +71,7 @@ describe('test', () => {
     });
 
 
-    context('reply control', () => {
+    context('replay control', () => {
       checkVideo({ paused: true, muted: false });
 
       cy.get('.player-control')
@@ -95,10 +95,16 @@ describe('test', () => {
       cy.get('.player-control-pause')
         .click();
 
-      fastSeek(10);
+      fastSeek(0);
       checkProgressBar();
 
-      fastSeek(70);
+      fastSeek(37.178);
+      checkProgressBar();
+
+      fastSeek(68.788);
+      checkProgressBar();
+
+      fastSeek(100);
       checkProgressBar();
     });
   });
