@@ -44,9 +44,9 @@ const checkProgressBar = () => {
 
 describe('test', () => {
   beforeEach(() => {
-    // const local = 'http://localhost:8080/';
-    const prod = 'http://test-player.surge.sh/';
-    cy.visit(prod);
+    const local = 'http://localhost:8080/';
+    // const prod = 'http://test-player.surge.sh/';
+    cy.visit(local);
   });
 
   it('check player', () => {

@@ -19,13 +19,14 @@ const app = () => {
   const playerControlIconMute = document.querySelector('.player-control-icon-mute');
   const playerProgressPlay = document.querySelector('.player-progress-play');
   const playerLoadingBox = document.querySelector('.player-loading-box');
-
-  player.volume = 0.2;
+  const playerControlVolume = document.querySelector('.player-control-volume');
 
   const state = {
     playerState: 'loading',
     muted: true,
     currentTime: 0,
+    controlsShown: false,
+    volume: 0.2,
   };
 
   const onVideoReady = () => {
@@ -64,6 +65,13 @@ const app = () => {
     state.muted = !state.muted;
   });
 
+  playerControlVolume.addEventListener('input', (e) => {
+    const volume = e.target.value;
+
+    state.muted = volume === '0';
+    state.volume = volume;
+  });
+
   watch(state, 'playerState', () => {
     switch (state.playerState) {
       case ('paused'):
@@ -85,6 +93,7 @@ const app = () => {
   });
 
   watch(state, 'muted', () => {
+    console.log('watch muted');
     if (state.muted) {
       player.muted = true;
       showIcon(playerControlIconMute, 'fa-volume-mute');
@@ -95,7 +104,11 @@ const app = () => {
   });
 
   watch(state, 'currentTime', () => {
-    playerProgressPlay.style.width = `${state.currentTime / player.duration * 100}%`;
+    playerProgressPlay.style.transform = `translateX(${state.currentTime / player.duration * 100}%)`;
+  });
+
+  watch(state, 'volume', () => {
+    player.volume = state.volume;
   });
 
   if (player.readyState > 3) {
