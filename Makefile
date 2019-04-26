@@ -11,5 +11,10 @@ build:
 lint:
 	npx eslint .
 
+test:
+	npx cypress run
+
 deploy: build
 	surge ./dist test-player.surge.sh
+
+.PHONY: test

@@ -1,14 +1,17 @@
 {
   "plugins": [
-    "babel"
+    "babel",
+    "cypress"
   ],
   "env": {
     "node": true,
-    "browser": true
+    "browser": true,
+    "cypress/globals": true
   },
   "parser": "babel-eslint",
   "extends": [
-    "airbnb-base"
+    "airbnb-base",
+    "plugin:cypress/recommended"
   ],
   "rules": {
     "no-console": 0,
