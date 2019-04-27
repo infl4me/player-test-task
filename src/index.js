@@ -26,7 +26,7 @@ const app = () => {
   const playerProgressPlay = document.querySelector('.player-progress-play');
   const playerLoadingBox = document.querySelector('.player-loading-box');
   const playerControlVolume = document.querySelector('.player-control-volume');
-  const playerControlsBar = document.querySelector('.player-controls-bar');
+  // const playerControlsBar = document.querySelector('.player-controls-bar');
   const playerWrap = document.querySelector('.player-wrap');
 
   const state = {
@@ -37,6 +37,7 @@ const app = () => {
     volume: 0.2,
     controlsState: {
       timeout: 0,
+      shown: false,
       timerId: null,
     },
   };
@@ -47,32 +48,32 @@ const app = () => {
   };
   player.addEventListener('canplaythrough', onVideoReady);
 
-  player.addEventListener('ended', () => {
-    state.playerState = 'finished';
-  });
-
   player.addEventListener('timeupdate', () => {
     state.currentTime = player.currentTime;
   });
 
   playerWrap.addEventListener('mousemove', () => {
-    state.controlsState.timeout = 3;
+    if (state.playerState !== 'playing') return;
+    state.controlsState.shown = true;
 
     clearTimeout(state.controlsState.timerId);
 
     state.controlsState.timerId = setTimeout(() => {
-      state.controlsState.timeout = 0;
+      state.controlsState.shown = false;
     }, 3000);
   });
 
-  playerWrap.addEventListener('mouseout', () => {
-    state.controlsState.timeout = 0;
+  playerWrap.addEventListener('mouseleave', () => {
+    if (state.playerState !== 'playing') return;
+    state.controlsState.shown = false;
     clearTimeout(state.controlsState.timerId);
   });
 
   playerControlPause.addEventListener('click', () => {
     if (state.playerState === 'playing') {
+      clearTimeout(state.controlsState.timerId);
       state.playerState = 'paused';
+      state.controlsState.shown = true;
     }
   });
 
@@ -80,12 +81,19 @@ const app = () => {
     switch (state.playerState) {
       case ('paused'):
         state.playerState = 'playing';
+        state.controlsState.shown = false;
         break;
       case ('finished'):
         state.playerState = 'playing';
+        state.controlsState.shown = false;
         break;
       default:
     }
+  });
+
+  player.addEventListener('ended', () => {
+    state.playerState = 'finished';
+    state.controlsState.shown = true;
   });
 
   playerControlMute.addEventListener('click', () => {
@@ -137,12 +145,13 @@ const app = () => {
     player.volume = state.volume;
   });
 
-  watch(state.controlsState, 'timeout', () => {
-    if (state.controlsState.timeout === 0) {
-      hide(playerControlsBar);
+  watch(state.controlsState, 'shown', () => {
+    console.log(state.controlsState.shown, state.playerState);
+    if (!state.controlsState.shown && state.playerState === 'playing') {
+      hide(playerWrap);
       return;
     }
-    show(playerControlsBar);
+    show(playerWrap);
   });
 
   if (player.readyState > 3) {
