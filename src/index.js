@@ -3,8 +3,14 @@ import './index.css';
 
 const { watch } = WatchJS;
 
-const hide = element => element.classList.add('hidden');
-const show = element => element.classList.remove('hidden');
+const hide = (element) => {
+  element.dataset.hidden = 'true';
+};
+
+const show = (element) => {
+  element.dataset.hidden = 'false';
+};
+
 const showIcon = (element, name) => {
   element.classList = '';
   element.classList.add('fas', name);
@@ -20,6 +26,8 @@ const app = () => {
   const playerProgressPlay = document.querySelector('.player-progress-play');
   const playerLoadingBox = document.querySelector('.player-loading-box');
   const playerControlVolume = document.querySelector('.player-control-volume');
+  const playerControlsBar = document.querySelector('.player-controls-bar');
+  const playerWrap = document.querySelector('.player-wrap');
 
   const state = {
     playerState: 'loading',
@@ -27,6 +35,10 @@ const app = () => {
     currentTime: 0,
     controlsShown: false,
     volume: 0.2,
+    controlsState: {
+      timeout: 0,
+      timerId: null,
+    },
   };
 
   const onVideoReady = () => {
@@ -41,6 +53,21 @@ const app = () => {
 
   player.addEventListener('timeupdate', () => {
     state.currentTime = player.currentTime;
+  });
+
+  playerWrap.addEventListener('mousemove', () => {
+    state.controlsState.timeout = 3;
+
+    clearTimeout(state.controlsState.timerId);
+
+    state.controlsState.timerId = setTimeout(() => {
+      state.controlsState.timeout = 0;
+    }, 3000);
+  });
+
+  playerWrap.addEventListener('mouseout', () => {
+    state.controlsState.timeout = 0;
+    clearTimeout(state.controlsState.timerId);
   });
 
   playerControlPause.addEventListener('click', () => {
@@ -93,7 +120,6 @@ const app = () => {
   });
 
   watch(state, 'muted', () => {
-    console.log('watch muted');
     if (state.muted) {
       player.muted = true;
       showIcon(playerControlIconMute, 'fa-volume-mute');
@@ -109,6 +135,14 @@ const app = () => {
 
   watch(state, 'volume', () => {
     player.volume = state.volume;
+  });
+
+  watch(state.controlsState, 'timeout', () => {
+    if (state.controlsState.timeout === 0) {
+      hide(playerControlsBar);
+      return;
+    }
+    show(playerControlsBar);
   });
 
   if (player.readyState > 3) {

@@ -15,7 +15,6 @@ const checkPlayerControl = (name) => {
 
 const checkPlayerControlMute = (name) => {
   cy.get('.player-control-mute')
-    .should('not.be.visible')
     .find('.fas')
     .should('have.class', name);
 };
@@ -35,7 +34,8 @@ const checkProgressBar = () => {
       const currentTimePercent = (currentTime / duration * 100).toFixed(3);
       cy.get('.player-progress-play')
         .should(($el) => {
-          const stringifiedWidth = ($el[0].style.width).slice(0, -1);
+          const regexp = /[0-9]+\.?[0-9]+/;
+          const stringifiedWidth = ($el[0].style.transform).match(regexp);
           const width = Number(stringifiedWidth).toFixed(3);
           expect(width).to.be.equal(currentTimePercent);
         });
@@ -44,9 +44,9 @@ const checkProgressBar = () => {
 
 describe('test', () => {
   beforeEach(() => {
-    const local = 'http://localhost:8080/';
-    // const prod = 'http://test-player.surge.sh/';
-    cy.visit(local);
+    // const local = 'http://localhost:8080/';
+    const prod = 'http://test-player.surge.sh/';
+    cy.visit(prod);
   });
 
   it('check player', () => {
