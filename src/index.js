@@ -36,7 +36,6 @@ const app = () => {
     controlsShown: false,
     volume: 0.2,
     controlsState: {
-      timeout: 0,
       shown: false,
       timerId: null,
     },
@@ -59,7 +58,9 @@ const app = () => {
     clearTimeout(state.controlsState.timerId);
 
     state.controlsState.timerId = setTimeout(() => {
-      state.controlsState.shown = false;
+      if (state.playerState === 'playing') {
+        state.controlsState.shown = false;
+      }
     }, 3000);
   });
 
@@ -71,7 +72,6 @@ const app = () => {
 
   playerControlPause.addEventListener('click', () => {
     if (state.playerState === 'playing') {
-      clearTimeout(state.controlsState.timerId);
       state.playerState = 'paused';
       state.controlsState.shown = true;
     }
@@ -80,9 +80,6 @@ const app = () => {
   playerControl.addEventListener('click', () => {
     switch (state.playerState) {
       case ('paused'):
-        state.playerState = 'playing';
-        state.controlsState.shown = false;
-        break;
       case ('finished'):
         state.playerState = 'playing';
         state.controlsState.shown = false;
