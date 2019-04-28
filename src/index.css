@@ -151,7 +151,7 @@ video {
   display: flex;
 }
 
-.player-control-volume {
+input[type="range"] {
   margin: 0;
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
   width: 100%; /* Specific width is required for Firefox. */
@@ -159,15 +159,15 @@ video {
   cursor: pointer;
 }
 
-.player-control-volume::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
 }
 
-.player-control-volume:focus {
+input[type="range"]:focus {
   outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
 }
 
-.player-control-volume::-ms-track {
+input[type="range"]::-ms-track {
   width: 100%;
 
   /* Hides the slider so custom styles can be added */
@@ -189,4 +189,30 @@ video {
   height: 5px;
   background-color: #fff;
   border-radius: 5px;
+}
+
+.player-control-time {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.player-control-time::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+.player-control-time::-webkit-slider-thumb {
+  position: absolute;
+  top: 0;
+  left: calc(100% - 12px);
+  width: 12px;
+  height: 12px;
+  transform: translateY(-6px);
+  border-radius: 50%;
+  background-color: #fff;
 }

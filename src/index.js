@@ -28,11 +28,13 @@ const app = () => {
   const playerControlVolume = document.querySelector('.player-control-volume');
   // const playerControlsBar = document.querySelector('.player-controls-bar');
   const playerWrap = document.querySelector('.player-wrap');
+  const playerControlTime = document.querySelector('.player-control-time');
 
   const state = {
     playerState: 'loading',
     muted: true,
     currentTime: 0,
+    seekTime: null,
     controlsShown: false,
     volume: 0.2,
     controlsState: {
@@ -46,10 +48,6 @@ const app = () => {
     player.removeEventListener('canplaythrough', onVideoReady);
   };
   player.addEventListener('canplaythrough', onVideoReady);
-
-  player.addEventListener('timeupdate', () => {
-    state.currentTime = player.currentTime;
-  });
 
   playerWrap.addEventListener('mousemove', () => {
     if (state.playerState !== 'playing') return;
@@ -98,10 +96,20 @@ const app = () => {
   });
 
   playerControlVolume.addEventListener('input', (e) => {
-    const volume = e.target.value;
+    const volume = Number(e.target.value);
 
-    state.muted = volume === '0';
+    state.muted = volume === 0;
     state.volume = volume;
+  });
+
+  player.addEventListener('timeupdate', (e) => {
+    state.currentTime = Number(e.target.currentTime);
+  });
+
+  playerControlTime.addEventListener('change', (e) => {
+    console.log(e.target.value, 'input');
+    // const currentTimePercent = Number(e.target.value);
+    state.seekTime = Number(e.target.value);
   });
 
   watch(state, 'playerState', () => {
@@ -135,7 +143,14 @@ const app = () => {
   });
 
   watch(state, 'currentTime', () => {
-    playerProgressPlay.style.transform = `translateX(${state.currentTime / player.duration * 100}%)`;
+    const currentTimePercent = state.currentTime / player.duration * 100;
+    playerProgressPlay.style.transform = `translateX(${currentTimePercent}%)`;
+    // playerControlTime.value = currentTimePercent;
+  });
+
+  watch(state, 'seekTime', () => {
+    const currentTime = state.seekTime * player.duration / 100;
+    player.currentTime = currentTime;
   });
 
   watch(state, 'volume', () => {
@@ -144,10 +159,10 @@ const app = () => {
 
   watch(state.controlsState, 'shown', () => {
     console.log(state.controlsState.shown, state.playerState);
-    if (!state.controlsState.shown && state.playerState === 'playing') {
-      hide(playerWrap);
-      return;
-    }
+    // if (!state.controlsState.shown && state.playerState === 'playing') {
+    //   hide(playerWrap);
+    //   return;
+    // }
     show(playerWrap);
   });
 

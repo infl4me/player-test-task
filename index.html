@@ -10,7 +10,7 @@
 <body>
   <div class="root">
     <div class="player">
-      <div class="player-wrap" data-hidden="true">
+      <div class="player-wrap" data-hidden="false">
         <video muted src="http://v1-rtc.1internet.tv/video/multibitrate/video/2018/12/13/3c7a1fae-88d5-48cb-a451-17fa7f8082ef_20180511_Dekabristi_new_950.mp4"></video>
         <div class="player-control-pause"></div>
         <button class="btn player-control">
@@ -29,6 +29,7 @@
               </div>
           </div>
           <div class="player-progress-bar">
+            <input type="range" min="0" max="100" step="0.1" value="0" class="player-control-time">
             <div class="player-progress-play"></div>
           </div>
         </div>
