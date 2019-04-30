@@ -2,6 +2,14 @@
   to {transform: rotate(360deg);}
 }
 
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   background-color: #000;
@@ -66,25 +74,6 @@ video {
   width: 35px;;
   height: 100%;
   color: #fff;
-}
-
-.player-progress-bar {
-  position: absolute;
-  top: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #000;
-}
-
-.player-progress-play {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-  transition: .1s transform;
 }
 
 .player-loading-box {
@@ -191,7 +180,44 @@ input[type="range"]::-ms-track {
   border-radius: 5px;
 }
 
+.player-progress-bar {
+  position: absolute;
+  top: -3px;
+  /* left: 6px; */
+  /* right: 6px; */
+  width: 100%;
+  height: 3px;
+  background-color: #000;
+}
+
+/* .player-progress-bar:hover {
+  top: -5px;
+  height: 5px;
+} */
+
+.player-progress-play {
+  /* position: absolute; */
+  /* top: 0; */
+  /* left: 0%; */
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  /* transition: .2s left; */
+}
+
+/* .player-progress-play::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  border-radius: 50%;
+} */
+
 .player-control-time {
+  z-index: 1;
   position: absolute;
   top: 0;
   left: 0;
@@ -207,12 +233,15 @@ input[type="range"]::-ms-track {
 }
 
 .player-control-time::-webkit-slider-thumb {
-  position: absolute;
-  top: 0;
-  left: calc(100% - 12px);
+  /* position: absolute;
+  top: -6px;
   width: 12px;
   height: 12px;
-  transform: translateY(-6px);
   border-radius: 50%;
-  background-color: #fff;
+  background-color: #fff; */
+}
+
+.player-progress-thumb {
+
+  /* transition: 0.2s left; */
 }

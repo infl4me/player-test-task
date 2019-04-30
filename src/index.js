@@ -27,20 +27,23 @@ const app = () => {
   const playerLoadingBox = document.querySelector('.player-loading-box');
   const playerControlVolume = document.querySelector('.player-control-volume');
   // const playerControlsBar = document.querySelector('.player-controls-bar');
+  const playerProgressBar = document.querySelector('.player-progress-bar');
   const playerWrap = document.querySelector('.player-wrap');
   const playerControlTime = document.querySelector('.player-control-time');
+  const playerProgressThumb = document.querySelector('.player-progress-thumb');
+  const sheet = window.document.styleSheets[0];
 
   const state = {
     playerState: 'loading',
     muted: true,
-    currentTime: 0,
-    seekTime: null,
-    controlsShown: false,
     volume: 0.2,
     controlsState: {
       shown: false,
       timerId: null,
     },
+    timeState: 'normal',
+    currentTime: 0,
+    seekTime: null,
   };
 
   const onVideoReady = () => {
@@ -95,6 +98,13 @@ const app = () => {
     state.muted = !state.muted;
   });
 
+  playerProgressBar.addEventListener('click', (e) => {
+    const pos = (e.pageX - e.target.offsetLeft) / e.target.offsetWidth;
+    // video.currentTime = pos * video.duration;
+
+    console.log(pos, 'pos');
+  });
+
   playerControlVolume.addEventListener('input', (e) => {
     const volume = Number(e.target.value);
 
@@ -103,14 +113,24 @@ const app = () => {
   });
 
   player.addEventListener('timeupdate', (e) => {
-    state.currentTime = Number(e.target.currentTime);
+    if (state.timeState !== 'normal') {
+      return;
+    }
+    const currentTimePercent = Number(e.target.currentTime) / player.duration * 100;
+    state.currentTime = currentTimePercent;
   });
 
-  playerControlTime.addEventListener('change', (e) => {
-    console.log(e.target.value, 'input');
-    // const currentTimePercent = Number(e.target.value);
-    state.seekTime = Number(e.target.value);
+  playerControlTime.addEventListener('input', (e) => {
+    state.timeState = 'seeking';
+    state.currentTime = Number(e.target.value);
   });
+
+  playerControlTime.addEventListener('change', () => {
+    setTimeout(() => {
+      state.timeState = 'normal';
+    }, 0);
+  });
+
 
   watch(state, 'playerState', () => {
     switch (state.playerState) {
@@ -142,15 +162,37 @@ const app = () => {
     }
   });
 
-  watch(state, 'currentTime', () => {
-    const currentTimePercent = state.currentTime / player.duration * 100;
-    playerProgressPlay.style.transform = `translateX(${currentTimePercent}%)`;
-    // playerControlTime.value = currentTimePercent;
-  });
+  const style = `.player-control-time::-webkit-slider-thumb {
+position: absolute;
+transform: translate(-50%, -50%);
+width: 12px;
+height: 12px;
+border-radius: 50%;
+background-color: #fff;
+}`;
+  const ruleId = sheet.insertRule(style);
+  const playerTimeThumbStyles = sheet.rules[ruleId].style;
 
-  watch(state, 'seekTime', () => {
-    const currentTime = state.seekTime * player.duration / 100;
-    player.currentTime = currentTime;
+  watch(state, 'currentTime', () => {
+    // const currentTimePercent = state.currentTime / player.duration * 100;
+    // playerProgressPlay.style.transform = `translateX(${currentTimePercent}%)`;
+    // playerProgressPlay.style.width = `${state.currentTime}%`;
+    console.log('WATCHER CURRENT TIME', '<<<>>>', state.timeState, '<<<>>>', state.currentTime);
+    switch (state.timeState) {
+      case ('normal'):
+        playerProgressPlay.style.width = `${state.currentTime}%`;
+        playerTimeThumbStyles.left = `${state.currentTime}%`;
+        break;
+      case ('seeking'): {
+        const currentTime = state.currentTime * player.duration / 100;
+        player.currentTime = currentTime;
+        playerControlTime.value = state.currentTime;
+        playerProgressPlay.style.width = `${state.currentTime}%`;
+        playerTimeThumbStyles.left = `${state.currentTime}%`;
+        break;
+      }
+      default:
+    }
   });
 
   watch(state, 'volume', () => {
@@ -159,10 +201,10 @@ const app = () => {
 
   watch(state.controlsState, 'shown', () => {
     console.log(state.controlsState.shown, state.playerState);
-    // if (!state.controlsState.shown && state.playerState === 'playing') {
-    //   hide(playerWrap);
-    //   return;
-    // }
+    if (!state.controlsState.shown && state.playerState === 'playing') {
+      hide(playerWrap);
+      return;
+    }
     show(playerWrap);
   });
 
