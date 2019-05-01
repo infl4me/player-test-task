@@ -26,12 +26,9 @@ const app = () => {
   const playerProgressPlay = document.querySelector('.player-progress-play');
   const playerLoadingBox = document.querySelector('.player-loading-box');
   const playerControlVolume = document.querySelector('.player-control-volume');
-  // const playerControlsBar = document.querySelector('.player-controls-bar');
   const playerProgressBar = document.querySelector('.player-progress-bar');
   const playerWrap = document.querySelector('.player-wrap');
-  const playerControlTime = document.querySelector('.player-control-time');
   const playerProgressThumb = document.querySelector('.player-progress-thumb');
-  const sheet = window.document.styleSheets[0];
 
   const state = {
     playerState: 'loading',
@@ -43,7 +40,17 @@ const app = () => {
     },
     timeState: 'normal',
     currentTime: 0,
-    seekTime: null,
+    skipAheadPosX: 0,
+  };
+
+  const hideControlsWithTimeout = () => {
+    clearTimeout(state.controlsState.timerId);
+
+    state.controlsState.timerId = setTimeout(() => {
+      if (state.playerState === 'playing' && state.timeState !== 'seeking') {
+        state.controlsState.shown = false;
+      }
+    }, 3000);
   };
 
   const onVideoReady = () => {
@@ -53,20 +60,17 @@ const app = () => {
   player.addEventListener('canplaythrough', onVideoReady);
 
   playerWrap.addEventListener('mousemove', () => {
-    if (state.playerState !== 'playing') return;
+    if (state.playerState !== 'playing') {
+      return;
+    }
     state.controlsState.shown = true;
-
-    clearTimeout(state.controlsState.timerId);
-
-    state.controlsState.timerId = setTimeout(() => {
-      if (state.playerState === 'playing') {
-        state.controlsState.shown = false;
-      }
-    }, 3000);
+    hideControlsWithTimeout();
   });
 
   playerWrap.addEventListener('mouseleave', () => {
-    if (state.playerState !== 'playing') return;
+    if (state.playerState !== 'playing' || state.timeState === 'seeking') {
+      return;
+    }
     state.controlsState.shown = false;
     clearTimeout(state.controlsState.timerId);
   });
@@ -98,13 +102,6 @@ const app = () => {
     state.muted = !state.muted;
   });
 
-  playerProgressBar.addEventListener('click', (e) => {
-    const pos = (e.pageX - e.target.offsetLeft) / e.target.offsetWidth;
-    // video.currentTime = pos * video.duration;
-
-    console.log(pos, 'pos');
-  });
-
   playerControlVolume.addEventListener('input', (e) => {
     const volume = Number(e.target.value);
 
@@ -116,21 +113,51 @@ const app = () => {
     if (state.timeState !== 'normal') {
       return;
     }
-    const currentTimePercent = Number(e.target.currentTime) / player.duration * 100;
-    state.currentTime = currentTimePercent;
+    state.currentTime = Number(e.target.currentTime);
   });
 
-  playerControlTime.addEventListener('input', (e) => {
+  const onThumbDrag = (event) => {
+    state.skipAheadPosX = event.pageX;
+  };
+
+  playerProgressBar.addEventListener('mousedown', (e) => {
     state.timeState = 'seeking';
-    state.currentTime = Number(e.target.value);
-  });
-
-  playerControlTime.addEventListener('change', () => {
-    setTimeout(() => {
+    onThumbDrag(e);
+    document.addEventListener('mousemove', onThumbDrag);
+    document.onmouseup = function onMouseUp() {
+      document.removeEventListener('mousemove', onThumbDrag);
       state.timeState = 'normal';
-    }, 0);
+      hideControlsWithTimeout();
+      document.onmouseup = null;
+    };
   });
 
+  watch(state, 'currentTime', () => {
+    if (state.timeState !== 'normal') {
+      return;
+    }
+    const currentTimePercent = state.currentTime / player.duration * 100;
+    const thumbOffset = playerProgressBar.offsetWidth * currentTimePercent / 100;
+    playerProgressThumb.style.transform = `translateX(${thumbOffset}px)`;
+    playerProgressPlay.style.transform = `scaleX(${currentTimePercent / 100})`;
+  });
+
+  watch(state, 'skipAheadPosX', () => {
+    if (state.timeState !== 'seeking') {
+      return;
+    }
+    const x = state.skipAheadPosX - playerProgressBar.offsetLeft;
+    let thumbNormalizedX = x;
+    if (x > playerProgressBar.offsetWidth) {
+      thumbNormalizedX = playerProgressBar.offsetWidth;
+    } else if (x < 0) {
+      thumbNormalizedX = 0;
+    }
+    playerProgressThumb.style.transform = `translateX(${thumbNormalizedX}px)`;
+    playerProgressPlay.style.transform = `scaleX(${thumbNormalizedX / playerProgressBar.offsetWidth})`;
+    const pointXPercent = thumbNormalizedX / playerProgressBar.offsetWidth * 100;
+    player.currentTime = (pointXPercent) * player.duration / 100;
+  });
 
   watch(state, 'playerState', () => {
     switch (state.playerState) {
@@ -159,39 +186,6 @@ const app = () => {
     } else {
       player.muted = false;
       showIcon(playerControlIconMute, 'fa-volume-up');
-    }
-  });
-
-  const style = `.player-control-time::-webkit-slider-thumb {
-position: absolute;
-transform: translate(-50%, -50%);
-width: 12px;
-height: 12px;
-border-radius: 50%;
-background-color: #fff;
-}`;
-  const ruleId = sheet.insertRule(style);
-  const playerTimeThumbStyles = sheet.rules[ruleId].style;
-
-  watch(state, 'currentTime', () => {
-    // const currentTimePercent = state.currentTime / player.duration * 100;
-    // playerProgressPlay.style.transform = `translateX(${currentTimePercent}%)`;
-    // playerProgressPlay.style.width = `${state.currentTime}%`;
-    console.log('WATCHER CURRENT TIME', '<<<>>>', state.timeState, '<<<>>>', state.currentTime);
-    switch (state.timeState) {
-      case ('normal'):
-        playerProgressPlay.style.width = `${state.currentTime}%`;
-        playerTimeThumbStyles.left = `${state.currentTime}%`;
-        break;
-      case ('seeking'): {
-        const currentTime = state.currentTime * player.duration / 100;
-        player.currentTime = currentTime;
-        playerControlTime.value = state.currentTime;
-        playerProgressPlay.style.width = `${state.currentTime}%`;
-        playerTimeThumbStyles.left = `${state.currentTime}%`;
-        break;
-      }
-      default:
     }
   });
 

@@ -34,19 +34,19 @@ const checkProgressBar = () => {
       const currentTimePercent = (currentTime / duration * 100).toFixed(3);
       cy.get('.player-progress-play')
         .should(($el) => {
-          const regexp = /[0-9]+\.?[0-9]+/;
+          const regexp = /[0-9]+\.?[0-9]*/;
           const stringifiedWidth = ($el[0].style.transform).match(regexp);
           const width = Number(stringifiedWidth).toFixed(3);
-          expect(width).to.be.equal(currentTimePercent);
+          expect(width).to.be.equal((currentTimePercent / 100).toFixed(3));
         });
     });
 };
 
 describe('test', () => {
   beforeEach(() => {
-    // const local = 'http://localhost:8080/';
-    const prod = 'http://test-player.surge.sh/';
-    cy.visit(prod);
+    const local = 'http://localhost:8080/';
+    // const prod = 'http://test-player.surge.sh/';
+    cy.visit(local);
   });
 
   it('check player', () => {
