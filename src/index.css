@@ -198,9 +198,9 @@ input[type="range"]::-ms-track {
   transform-origin: left;
 }
 
-.player-progress-bar:hover {
+/* .player-progress-bar:hover {
   height: 5px;
-}
+} */
 
 .player-progress-thumb {
   position: absolute;

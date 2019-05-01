@@ -116,21 +116,34 @@ const app = () => {
     state.currentTime = Number(e.target.currentTime);
   });
 
-  const onThumbDrag = (event) => {
-    state.skipAheadPosX = event.pageX;
-  };
-
-  playerProgressBar.addEventListener('mousedown', (e) => {
+  const onSliderDrag = type => (e) => {
     state.timeState = 'seeking';
+
+    const onThumbDrag = (event) => {
+      if (type === 'mouse') {
+        state.skipAheadPosX = event.pageX;
+      }
+      if (type === 'touch') {
+        state.skipAheadPosX = event.touches[0].pageX;
+      }
+    };
+
     onThumbDrag(e);
-    document.addEventListener('mousemove', onThumbDrag);
-    document.onmouseup = function onMouseUp() {
-      document.removeEventListener('mousemove', onThumbDrag);
+
+    const moveEventType = type === 'mouse' ? 'mousemove' : 'touchmove';
+    document.addEventListener(moveEventType, onThumbDrag);
+
+    const endEventType = type === 'mouse' ? 'onmouseup' : 'ontouchend';
+    document[endEventType] = () => {
+      document.removeEventListener(moveEventType, onThumbDrag);
       state.timeState = 'normal';
       hideControlsWithTimeout();
-      document.onmouseup = null;
+      document[endEventType] = null;
     };
-  });
+  };
+
+  playerProgressBar.addEventListener('mousedown', onSliderDrag('mouse'));
+  playerProgressBar.addEventListener('touchstart', onSliderDrag('touch'));
 
   watch(state, 'currentTime', () => {
     if (state.timeState !== 'normal') {
