@@ -5,6 +5,6 @@ node_js:
   - stable
 
 script:
-  - make start
+  - npx webpack-dev-server --open &
   - make lint
   - make test
