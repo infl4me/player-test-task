@@ -15,7 +15,7 @@ test:
 	npx cypress run
 
 deploy: build
-	surge ./dist test-player.surge.sh
+	surge ./dist test-player2.surge.sh
 
 cypress-open:
 	npx cypress open

@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/infl4me/player-test-task.svg?branch=master)](https://travis-ci.org/infl4me/player-test-task)
-[demo](http://test-player.surge.sh)
+[demo](http://test-player2.surge.sh)
 
 # Task
 Напишите видеоплеер для файла http://iandevlin.github.io/mdn/video-player/video/tears-of-steel-battle-clip-medium.mp4. Плеер должен стартовать проигрывание автоматически, по клику на видео ставить его на паузу  и показывать в центре картинки кнопку продолжения. По клику на кнопку продолжения продолжать воспроизведение с места остановки. После окончания видео в центре картинки должна появляться кнопка воспроизведения видео с начала.
